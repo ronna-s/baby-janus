@@ -1,0 +1,81 @@
+version: '3'
+services:
+
+  dns:
+    image: andyshinn/dnsmasq
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    command: -A /wwgberlin/127.0.0.1
+
+  proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - network
+
+  baby_janus_gateway:
+    image: baby_janus_gateway
+    ports:
+      - "8080:8080"
+    build:
+      context: ./gateway
+    volumes:
+      - .:/go/src/github.com/wwgberlin/baby_janus/
+    networks:
+      - network
+    depends_on:
+      - dns
+      - proxy
+    links:
+      - dns
+      - proxy
+    environment:
+      - VIRTUAL_HOST=gateway.wwgberlin
+
+  baby_janus_server:
+    image: baby_janus_server
+    build:
+      context: ./server
+    volumes:
+      - .:/go/src/github.com/wwgberlin/baby_janus/
+    networks:
+      - network
+    depends_on:
+      - dns
+      - proxy
+      - baby_janus_gateway
+    links:
+      - dns
+      - proxy
+      - baby_janus_gateway
+    environment:
+      - VIRTUAL_HOST=server.wwgberlin
+      - CLUSTER_STRATEGY=random
+
+  baby_janus_test_app:
+    image: baby_janus_app
+    ports:
+      - "8081:8080"
+    build:
+      context: ./app
+    volumes:
+      - .:/go/src/github.com/wwgberlin/baby_janus/
+    networks:
+      - network
+    depends_on:
+      - dns
+      - proxy
+      - baby_janus_gateway
+    links:
+      - dns
+      - proxy
+      - baby_janus_gateway
+
+networks:
+  network:
