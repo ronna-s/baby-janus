@@ -31,3 +31,14 @@ When you are done we will use docker to run everything (we will start 10 servers
 ### Too easy?
 You may have noticed that your implementation doesn't support calling register_endpoint with different targets but the same origin.
 If you remove the call to `t.skip()` inside the round robin test in `main_test.go`, you will find that your tests are failing again. Add a round robin mechanism that will allow registering mulitple endpoints with the same origin in the API and will iterate over the targets. 
+
+### A little docker
+```bash
+docker ps -a # lists all of your containers
+docker exec -it <container-hash-id> bash # will start a bash command line for you inside the container (you can execute many commands - not just bash)
+docker-compose up # starts all containers listed in the docker-compose file
+docker-compose run <container-name> bash # similar to docker exec except it will create a new container for you to run bash (or any other command).
+docker-compose stop # stop all containers listed in the docker-compose file
+docker-compose down # stops and removes all the containers (but not their images)
+docker-compose down -v --remove-orphans # remove images also --RECOMMENDED!!! (the images are quite large)
+```
