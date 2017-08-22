@@ -34,11 +34,12 @@ If you remove the call to `t.skip()` inside the round robin test in `main_test.g
 
 ### A little docker
 ```bash
+docker-compose build # build the images listed in your docker-compose file
+docker-compose up # starts all containers listed in the docker-compose file
 docker ps -a # lists all of your containers
 docker exec -it <container-hash-id> bash # will start a bash command line for you inside the container (you can execute many commands - not just bash)
-docker-compose up # starts all containers listed in the docker-compose file
 docker-compose run <container-name> bash # similar to docker exec except it will create a new container for you to run bash (or any other command).
 docker-compose stop # stop all containers listed in the docker-compose file
-docker-compose down # stops and removes all the containers (but not their images)
-docker-compose down -v --remove-orphans # remove images also --RECOMMENDED!!! (the images are quite large)
+docker-compose down # stops and removes all the containers (but not the images)
+docker-compose down -v --remove-orphans # remove images also - RECOMMENDED!!! (the images are quite large)
 ```
