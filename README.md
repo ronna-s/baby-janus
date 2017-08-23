@@ -2,8 +2,8 @@
 The HelloFresh baby Janus challenge
 
 ### The challenge:
-You will build an HTTP gateway API (router) that can register routes [origin=>target] in runtime.
-The gateway will then listen to requests on the path defined in origin, and redirect to the target.
+You will build an HTTP gateway API (router) that can register routes [origin=>destination] in runtime.
+The gateway will then listen to requests on the path defined in origin, and reverse proxy the destination.
 
 Have a look at the project - there are 3 components inside the project:    
 1. *app* - a test app that will register the endpoints `/hi` (to return hello world) and `/parts` to return a super secret HTML file.
@@ -17,9 +17,9 @@ When you are done we will use docker to run everything (we will start 10 servers
 2. The handler will receive post HTTP messages with the json format
 
 ```javascript
-{"origin": "/some/path", "target": "http://some_domain:port/target"}
+{"orig": "/some/path", "dest": "http://some_domain:port/dest"}
 ```
-3. After parsing the request body and retreiving the endpoint data, register another http handler to the origin path, which will upon request redirect to the target. Closures are your friends!!!
+3. After parsing the request body and retreiving the endpoint data, register another http handler to the origin path, which will upon request reverse proxy the destination. Closures are your friends!!!
 4. To test and execute, run: `docker-compose up baby_janus_gateway`, the docker command will run the tests and only if they pass will start the gateway API.
 5. As usual, when the test runs properly, you will be able to see the result:
   

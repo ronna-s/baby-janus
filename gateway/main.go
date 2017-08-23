@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"reflect"
 
@@ -12,58 +11,22 @@ import (
 
 type (
 	Endpoint struct {
-		Origin string
-		Target string
-	}
-	api struct {
-		routes     map[string]chan string
-		incomingCh chan Endpoint
+		Orig string
+		Dest string
 	}
 )
 
 func main() {
-	a := api{routes: map[string]chan string{}, incomingCh: make(chan Endpoint, 1)}
 	c := cluster.NewCluster()
 
 	//gateway api operations
 	http.HandleFunc("/routes", listRoutes)
-	http.HandleFunc("/register_endpoint", a.registerEndpoint)
 
 	//cluster operations
 	http.HandleFunc("/next_cluster_id", incrClusterId(c))
 	http.HandleFunc("/seed", getSeed(c))
 
 	http.ListenAndServe(":8080", nil)
-}
-
-/*
-	registerEndpoint handles requests to registers routes origin - target
- */
-func (a *api) registerEndpoint(response http.ResponseWriter, request *http.Request) {
-	var endpoint Endpoint
-	if request != nil && request.Body != nil {
-		body, err := ioutil.ReadAll(request.Body)
-		if err != nil {
-			response.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		if err := json.Unmarshal(body, &endpoint); err != nil {
-			response.WriteHeader(http.StatusBadRequest)
-		}
-		http.HandleFunc(endpoint.Origin, a.redirectHandler(endpoint.Target))
-		response.WriteHeader(http.StatusCreated)
-	}
-}
-
-/*
-	redirectHandler returns a handler to redirect the request to
- */
-
-func (a *api) redirectHandler(target string) func(http.ResponseWriter, *http.Request) {
-	fmt.Println("registered", target)
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, target, http.StatusFound)
-	}
 }
 
 

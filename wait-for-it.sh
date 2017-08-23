@@ -131,7 +131,7 @@ if [[ "$HOST" == "" || "$PORT" == "" ]]; then
     echoerr "Error: you need to provide a host and port to test."
     usage
 fi
-TIMEOUT=${TIMEOUT:-15}
+TIMEOUT=${TIMEOUT:-10}
 STRICT=${STRICT:-0}
 CHILD=${CHILD:-0}
 QUIET=${QUIET:-0}

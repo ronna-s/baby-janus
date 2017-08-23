@@ -12,8 +12,8 @@ import (
 
 type (
 	Endpoint struct {
-		Origin string
-		Target string
+		Orig string
+		Dest string
 	}
 )
 

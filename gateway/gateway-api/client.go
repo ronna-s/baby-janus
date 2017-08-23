@@ -10,7 +10,7 @@ type (
 	Client interface {
 		GetID() int
 		GetSeed() int64
-		RegisterRoute(origin string, target string)
+		RegisterRoute(orig string, dest string) error
 	}
 	client struct {
 		gatewayServer string
@@ -21,17 +21,18 @@ func NewGatewayClient(gatewayServer string) Client {
 	return &client{gatewayServer: gatewayServer}
 }
 
-func (client *client) RegisterRoute(origin string, target string) {
+func (client *client) RegisterRoute(orig string, dest string) error {
 	b, err := json.Marshal(struct {
-		Origin string
-		Target string
-	}{Origin: origin, Target: target})
+		Orig string
+		Dest string
+	}{Orig: orig, Dest: dest})
 
 	if err != nil {
-		panic(fmt.Sprintf("failed registering route %s => %s reason: %s", origin, target, err.Error()))
+		err = fmt.Errorf("failed registering route %s => %s reason: %s", orig, dest, err.Error())
 	}
 
 	mustHttpPost(fmt.Sprintf("%s/register_endpoint", client.gatewayServer), "application/json", b)
+	return err
 }
 
 func (client *client) GetID() int {
