@@ -30,7 +30,7 @@ When you are done we will use docker to run everything (we will start 10 servers
 
 ### Too easy?
 You may have noticed that your implementation doesn't support calling register_endpoint with different targets but the same origin.
-If you remove the call to `t.skip()` inside the round robin test in `main_test.go`, you will find that your tests are failing again. Add a round robin mechanism that will allow registering mulitple endpoints with the same origin in the API and will iterate over the targets. 
+Add a round robin mechanism that will allow registering mulitple endpoints with the same origin in the API while iterating over the destinations.
 
 ### A little docker
 ```bash
