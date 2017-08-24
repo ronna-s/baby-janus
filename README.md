@@ -41,4 +41,5 @@ docker exec -it <container-hash-id> bash # will start a bash command line for yo
 docker-compose run <container-name> bash # similar to docker exec except it will create a new container for you to run bash (or any other command).
 docker-compose stop # stop all containers listed in the docker-compose file
 docker-compose down # stops and removes all the containers (but not the images)
+docker-compose down --rmi #also removes the images
 ```
