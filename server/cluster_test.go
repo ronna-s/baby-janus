@@ -1,4 +1,4 @@
-package cluster
+package main
 
 import (
 	"fmt"
@@ -7,12 +7,12 @@ import (
 )
 
 func TestGetParts(t *testing.T) {
-	c := NewCluster()
-	c.numParts = 0
+	c := Cluster{numParts: 0}
 	if len(c.GetParts()) != 0 {
 		t.Error("should return empty array")
 	}
 	c.numParts = 10
+	c.slicer = getPart
 	parts := c.GetParts()
 	if len(parts) != 10 {
 		t.Error("should return 10 items")
@@ -22,9 +22,8 @@ func TestGetParts(t *testing.T) {
 	}
 }
 
-
 func TestGetInstanceParts(t *testing.T) {
-	c := NewCluster()
+	c := Cluster{}
 	c.randomize = func(s []string) []string { return s }
 	c.slicer = func(pos int) interface{} { return pos }
 
@@ -35,8 +34,8 @@ func TestGetInstanceParts(t *testing.T) {
 	}
 
 	c.numInstances = 10
-	c.numParts = NUM_PARTS
-	resStr := []string{}
+	c.numParts = numParts
+	var resStr []string
 
 	for i := 0; i < c.numInstances; i++ {
 		resStr = append(resStr, c.GetInstanceParts(i)...)

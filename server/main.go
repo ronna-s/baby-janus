@@ -7,20 +7,19 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/wwgberlin/baby_janus/gateway/gateway-api"
-	"github.com/wwgberlin/baby_janus/server/cluster"
+	"github.com/ronna-s/baby-janus/gateway"
 )
 
 func main() {
 	myDomain := os.Getenv("HOSTNAME")
-	client := gateway_api.NewGatewayClient("http://baby_janus_gateway:8080")
+	client := gateway.NewClient("http://baby_janus_gateway:8080")
 	rand.Seed(client.GetSeed())
 	id := client.GetID()
 	registerRoutes(client, id, myDomain)
 	http.ListenAndServe(":8080", nil)
 }
 
-func registerRoutes(api gateway_api.Client, id int, myDomain string) {
+func registerRoutes(api *gateway.Client, id int, myDomain string) {
 	routes := getRoutes(id)
 	for i := range routes {
 		route := routes[i]
@@ -36,8 +35,8 @@ func registerRoutes(api gateway_api.Client, id int, myDomain string) {
 }
 
 func getRoutes(id int) (parts []string) {
-	c := cluster.NewCluster()
-	if os.Getenv("CLUSTER_STRATEGY") == "all"{
+	c := NewCluster()
+	if os.Getenv("CLUSTER_STRATEGY") == "all" {
 		parts = c.GetParts()
 	} else {
 		parts = c.GetInstanceParts(id)

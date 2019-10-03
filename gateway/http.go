@@ -1,4 +1,4 @@
-package gateway_api
+package gateway
 
 import (
 	"bytes"
@@ -6,21 +6,13 @@ import (
 	"net/http"
 )
 
-func mustHttpPost(url string, contentType string, body []byte) (err error) {
-	var resp *http.Response
-	resp, err = http.Post(url, contentType, bytes.NewBuffer(body))
-	defer func() {
-		if resp != nil && resp.Body != nil {
-			resp.Body.Close()
-		}
-	}()
+func httpPost(url string, contentType string, body []byte) error {
+	resp, err := http.Post(url, contentType, bytes.NewBuffer(body))
 	if err != nil {
-		return
+		return err
 	}
-	body, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	}
+
+	defer resp.Body.Close()
 	return nil
 }
 

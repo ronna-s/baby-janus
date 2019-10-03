@@ -1,5 +1,5 @@
 FROM golang:latest
-WORKDIR /go/src/github.com/wwgberlin/baby_janus/gateway
-RUN cd /go/src/github.com/wwgberlin/baby_janus/gateway
-CMD go test ./... && go build && /go/src/github.com/wwgberlin/baby_janus/gateway/gateway
+WORKDIR /go/src/github.com/ronna-s/baby-janus/gateway
+RUN cd /go/src/github.com/ronna-s/baby-janus/gateway
+CMD go test ./... && go run /go/src/github.com/ronna-s/baby-janus/gateway/cmd/gateway/main.go
 EXPOSE 8080

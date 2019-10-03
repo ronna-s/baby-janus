@@ -8,7 +8,7 @@ services:
     ports:
       - "53:53/tcp"
       - "53:53/udp"
-    command: -A /wwgberlin/127.0.0.1
+    command: -A /ronna-s/127.0.0.1
 
   proxy:
     image: jwilder/nginx-proxy
@@ -26,7 +26,7 @@ services:
     build:
       context: ./gateway
     volumes:
-      - .:/go/src/github.com/wwgberlin/baby_janus/
+      - .:/go/src/github.com/ronna-s/baby-janus/
     networks:
       - network
     depends_on:
@@ -36,14 +36,14 @@ services:
       - dns
       - proxy
     environment:
-      - VIRTUAL_HOST=gateway.wwgberlin
+      - VIRTUAL_HOST=gateway.ronna-s
 
   baby_janus_server:
     image: baby_janus_server
     build:
       context: ./server
     volumes:
-      - .:/go/src/github.com/wwgberlin/baby_janus/
+      - .:/go/src/github.com/ronna-s/baby-janus/
     networks:
       - network
     depends_on:
@@ -55,7 +55,7 @@ services:
       - proxy
       - baby_janus_gateway
     environment:
-      - VIRTUAL_HOST=server.wwgberlin
+      - VIRTUAL_HOST=server.ronna-s
       - CLUSTER_STRATEGY=random
 
   baby_janus_test_app:
@@ -65,7 +65,7 @@ services:
     build:
       context: ./app
     volumes:
-      - .:/go/src/github.com/wwgberlin/baby_janus/
+      - .:/go/src/github.com/ronna-s/baby-janus/
     networks:
       - network
     depends_on:

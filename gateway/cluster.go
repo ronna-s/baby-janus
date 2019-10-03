@@ -1,4 +1,4 @@
-package cluster
+package gateway
 
 import (
 	"time"
@@ -11,7 +11,7 @@ type (
 	}
 
 	cluster struct {
-		locker         *mutexLocker
+		locker         *lock
 		currInstanceId int
 		seed           int64
 	}
