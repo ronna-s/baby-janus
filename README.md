@@ -20,11 +20,11 @@ When you are done we will use docker to run everything (we will start 10 servers
 {"orig": "/some/path", "dest": "http://some_domain:port/dest"}
 ```
 3. After parsing the request body and retreiving the endpoint data, register another http handler to the origin path, which will upon request reverse proxy the destination. Closures are your friends!!!
-4. To test and execute, run: `docker-compose up baby_janus_gateway`, the docker command will run the tests and only if they pass will start the API gateway.
+4. To test and execute, run: `docker-compose up baby-janus_gateway`, the docker command will run the tests and only if they pass will start the API gateway.
 5. As usual, when the test runs properly, you will be able to see the result:
   
       ``` bash
-      docker-compose up --scale baby_janus_server=10
+      docker-compose up --scale baby-janus_server=10
       ```
       Now navigate to http://127.0.0.1:8080/parts to see the results.
 

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -12,11 +13,11 @@ import (
 
 func main() {
 	myDomain := os.Getenv("HOSTNAME")
-	client := gateway.NewClient("http://baby_janus_gateway:8080")
+	client := gateway.NewClient("http://baby-janus_gateway:8080")
 	rand.Seed(client.GetSeed())
 	id := client.GetID()
 	registerRoutes(client, id, myDomain)
-	http.ListenAndServe(":8080", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func registerRoutes(api *gateway.Client, id int, myDomain string) {

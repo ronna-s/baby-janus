@@ -19,8 +19,8 @@ services:
     networks:
       - network
 
-  baby_janus_gateway:
-    image: baby_janus_gateway
+  baby-janus_gateway:
+    image: baby-janus_gateway
     ports:
       - "8080:8080"
     build:
@@ -38,8 +38,8 @@ services:
     environment:
       - VIRTUAL_HOST=gateway.ronna-s
 
-  baby_janus_server:
-    image: baby_janus_server
+  baby-janus_server:
+    image: baby-janus_server
     build:
       context: ./server
     volumes:
@@ -49,17 +49,17 @@ services:
     depends_on:
       - dns
       - proxy
-      - baby_janus_gateway
+      - baby-janus_gateway
     links:
       - dns
       - proxy
-      - baby_janus_gateway
+      - baby-janus_gateway
     environment:
       - VIRTUAL_HOST=server.ronna-s
       - CLUSTER_STRATEGY=random
 
-  baby_janus_test_app:
-    image: baby_janus_app
+  baby-janus_test_app:
+    image: baby-janus_app
     ports:
       - "8081:8080"
     build:
@@ -71,11 +71,11 @@ services:
     depends_on:
       - dns
       - proxy
-      - baby_janus_gateway
+      - baby-janus_gateway
     links:
       - dns
       - proxy
-      - baby_janus_gateway
+      - baby-janus_gateway
 
 networks:
   network:

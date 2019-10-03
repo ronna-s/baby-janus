@@ -24,7 +24,7 @@ func parts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	for _, path := range getPartsURLs() {
 		func() {
-			route := fmt.Sprintf("http://baby_janus_gateway:8080%s", path)
+			route := fmt.Sprintf("http://baby-janus_gateway:8080%s", path)
 			resp, err := http.Get(route)
 			if err != nil {
 				panic(fmt.Sprintf("error fetching %v: %v", route, err))
@@ -58,7 +58,7 @@ func main() {
 	//myDomain := "127.0.0.1:8081"
 	myDomain := os.Getenv("HOSTNAME") + ":8080"
 
-	client := gateway.NewClient("http://baby_janus_gateway:8080")
+	client := gateway.NewClient("http://baby-janus_gateway:8080")
 	log.Println("registering", "/hi")
 	client.RegisterRoute("/hi", fmt.Sprintf("http://%v/hi", myDomain))
 	log.Println("registering", "/parts")
