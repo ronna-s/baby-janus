@@ -31,6 +31,7 @@ func registerRoutes(api *gateway.Client, id int, myDomain string) {
 			}
 			fmt.Fprintf(w, string(b))
 		})
+		fmt.Printf("registering route %s\n", route)
 		api.RegisterRoute(fmt.Sprintf(route), fmt.Sprintf("http://%s:8080%s", myDomain, route))
 	}
 }
