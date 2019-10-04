@@ -7,9 +7,14 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/ronna-s/baby-janus/gateway"
 )
+
+func init(){
+	time.Sleep(15*time.Second)
+}
 
 func main() {
 	myDomain := os.Getenv("HOSTNAME")
