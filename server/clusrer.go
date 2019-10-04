@@ -15,7 +15,7 @@ type (
 )
 
 const (
-	numParts     = 136
+	numParts     = 454
 	numInstances = 10
 )
 

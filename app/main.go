@@ -10,7 +10,7 @@ import (
 	"github.com/ronna-s/baby-janus/gateway"
 )
 
-const numParts = 136
+const numParts = 454
 
 type (
 	Endpoint struct {
