@@ -22,15 +22,29 @@ func TestProxy(t *testing.T) {
 }
 
 func testProxy(t *testing.T) {
-	rs := "good job"
+	const (
+		rs      = "good job"
+		sup     = "sup?"
+		method  = "YOLO"
+		notMuch = "not much"
+		retCode = http.StatusAlreadyReported
+	)
 	found := false
 
 	cookie := http.Cookie{Name: "test", Value: "cookie"}
 	http.HandleFunc(dest, func(w http.ResponseWriter, r *http.Request) {
 		if len(r.Cookies()) == 0 || r.Cookies()[0].Name != cookie.Name || r.Cookies()[0].Value != cookie.Value {
-			t.Fatalf("Expcetd to receive the original request's cookie")
+			t.Errorf("Expcetd to receive the original request's cookie")
+		}
+		if r.Method != method {
+			t.Errorf("Unexpected method in request")
+		}
+		if r.Header.Get("Content-Type") != sup {
+			t.Errorf("Unexpected context type in request")
 		}
 		found = true
+		w.Header().Add("Content-Type", notMuch)
+		w.WriteHeader(retCode)
 		fmt.Fprintf(w, rs)
 	})
 
@@ -39,9 +53,16 @@ func testProxy(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	body := string(httpGet(t, fmt.Sprintf("%s%s", domain, orig), &cookie))
-	if rs != body {
+	body, code, contentType := httpDo(method, t, fmt.Sprintf("%s%s", domain, orig), &cookie, sup)
+	if rs != string(body) {
 		t.Error("http body is incorrect", body)
+	}
+	if code != retCode {
+		t.Errorf("Unexpcted response status code")
+	}
+
+	if contentType != notMuch {
+		t.Errorf("Unexpected content type in response")
 	}
 
 	if !found {
@@ -49,11 +70,12 @@ func testProxy(t *testing.T) {
 	}
 }
 
-func httpGet(t *testing.T, url string, cookie *http.Cookie) []byte {
-	req, _ := http.NewRequest("GET", url, nil)
+func httpDo(method string, t *testing.T, url string, cookie *http.Cookie, contentType string) ([]byte, int, string) {
+	req, _ := http.NewRequest(method, url, nil)
 	if cookie != nil {
 		req.AddCookie(cookie)
 	}
+	req.Header.Add("Content-Type", contentType)
 	var client http.Client
 	resp, err := client.Do(req)
 	defer func() {
@@ -66,10 +88,6 @@ func httpGet(t *testing.T, url string, cookie *http.Cookie) []byte {
 		t.Fatalf("Not found %s", url)
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("Expected to return status ok. url: %s, returned: %d", url, resp.StatusCode)
-	}
-
 	if err != nil {
 		t.Fatalf("unexpected error %s", err.Error())
 	}
@@ -77,7 +95,7 @@ func httpGet(t *testing.T, url string, cookie *http.Cookie) []byte {
 	if err != nil {
 		t.Fatalf("unexpected error %s", err.Error())
 	}
-	return body
+	return body, resp.StatusCode, resp.Header.Get("Content-Type")
 }
 
 func setup() {
