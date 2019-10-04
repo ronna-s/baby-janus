@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/ronna-s/baby-janus/gateway"
 	"io"
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/ronna-s/baby-janus/gateway"
+	"time"
 )
 
 const numParts = 454
@@ -18,6 +18,10 @@ type (
 		Dest string
 	}
 )
+
+func init(){
+	time.Sleep(15*time.Second)
+}
 
 // parts - handler to get all parts
 func parts(w http.ResponseWriter, r *http.Request) {
