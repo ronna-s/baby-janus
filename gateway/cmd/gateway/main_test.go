@@ -40,7 +40,7 @@ func testProxy(t *testing.T) {
 			t.Errorf("Unexpected method in request")
 		}
 		if r.Header.Get("Content-Type") != sup {
-			t.Errorf("Unexpected context type in request")
+			t.Errorf("Unexpected content type in request")
 		}
 		found = true
 		w.Header().Add("Content-Type", notMuch)
