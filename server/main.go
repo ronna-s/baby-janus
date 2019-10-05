@@ -2,21 +2,18 @@ package main
 
 import (
 	"fmt"
+	"github.com/ronna-s/baby-janus/gateway"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/ronna-s/baby-janus/gateway"
 )
 
-func init(){
-	time.Sleep(15*time.Second)
-}
 
 func main() {
+	time.Sleep(10*time.Second)
 	myDomain := os.Getenv("HOSTNAME")
 	client := gateway.NewClient("http://baby-janus_gateway:8080")
 	rand.Seed(client.GetSeed())

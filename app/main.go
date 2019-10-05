@@ -20,7 +20,7 @@ type (
 )
 
 func init(){
-	time.Sleep(15*time.Second)
+	time.Sleep(10*time.Second)
 }
 
 // parts - handler to get all parts
