@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"reflect"
@@ -44,7 +45,45 @@ func run(ready chan struct{}) {
 	// 5. Copy the status code to the original response
 	// 6. Copy the response body (io.Copy is your friend)
 	// 7. This should work
-	
+
+	//[your code here!!!!]
+	http.HandleFunc("/register-endpoint", func(w http.ResponseWriter, r *http.Request) {
+		var ep Endpoint
+		if err := json.NewDecoder(r.Body).Decode(&ep); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		http.HandleFunc(ep.Orig, func(w http.ResponseWriter, r *http.Request) {
+			var client http.Client
+			req, err := http.NewRequest(r.Method, ep.Dest, r.Body)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			//copy headers (incl. cookies)
+			for k, values := range r.Header {
+				for _, v := range values {
+					req.Header.Add(k, v)
+				}
+			}
+
+			resp, err := client.Do(req)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			defer resp.Body.Close()
+
+			w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+			w.WriteHeader(resp.StatusCode)
+			io.Copy(w, resp.Body)
+		})
+
+		//your next steps go here
+	})
+
 	go func() {
 		close(ready)
 	}()
