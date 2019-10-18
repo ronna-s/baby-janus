@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"reflect"
+	"sync"
+	"sync/atomic"
 
 	"github.com/ronna-s/baby-janus/gateway"
 )
@@ -47,6 +49,9 @@ func run(ready chan struct{}) {
 	// 7. This should work
 
 	//[your code here!!!!]
+	destinations := make(map[string][]string)
+	positions := make(map[string]*int32)
+	var mu sync.RWMutex
 	http.HandleFunc("/register-endpoint", func(w http.ResponseWriter, r *http.Request) {
 		var ep Endpoint
 		if err := json.NewDecoder(r.Body).Decode(&ep); err != nil {
@@ -54,32 +59,47 @@ func run(ready chan struct{}) {
 			return
 		}
 
-		http.HandleFunc(ep.Orig, func(w http.ResponseWriter, r *http.Request) {
-			var client http.Client
-			req, err := http.NewRequest(r.Method, ep.Dest, r.Body)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
+		mu.Lock()
+		defer mu.Unlock()
+		_, exists := destinations[ep.Orig]
+		destinations[ep.Orig] = append(destinations[ep.Orig], ep.Dest)
+		var i int32 = -1
+		positions[ep.Orig] = &i
 
-			//copy headers (incl. cookies)
-			for k, values := range r.Header {
-				for _, v := range values {
-					req.Header.Add(k, v)
+
+		if !exists {
+			http.HandleFunc(ep.Orig, func(w http.ResponseWriter, r *http.Request) {
+				mu.RLock()
+				defer mu.RUnlock()
+				dests := destinations[ep.Orig]
+				pos := atomic.AddInt32(positions[ep.Orig], 1)
+				dest := dests[int(pos)%len(dests)]
+				var client http.Client
+				req, err := http.NewRequest(r.Method, dest, r.Body)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					return
 				}
-			}
 
-			resp, err := client.Do(req)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			defer resp.Body.Close()
+				//copy headers (incl. cookies)
+				for k, values := range r.Header {
+					for _, v := range values {
+						req.Header.Add(k, v)
+					}
+				}
 
-			w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
-			w.WriteHeader(resp.StatusCode)
-			io.Copy(w, resp.Body)
-		})
+				resp, err := client.Do(req)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				defer resp.Body.Close()
+
+				w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+				w.WriteHeader(resp.StatusCode)
+				io.Copy(w, resp.Body)
+			})
+		}
 
 		//your next steps go here
 	})
