@@ -103,3 +103,30 @@ func setup() {
 	go run(ready)
 	<-ready
 }
+
+func TestLoadBalancing(t *testing.T) {
+	http.HandleFunc(dest+"1", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("hello from 1"))
+	})
+	http.HandleFunc(dest+"2", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("hello from 2"))
+	})
+
+	client := gateway.NewClient(domain)
+	if err := client.RegisterRoute(orig+"new", fmt.Sprintf("%s%s", domain, dest+"1")); err != nil {
+		t.Fatal(err)
+	}
+	if err := client.RegisterRoute(orig+"new", fmt.Sprintf("%s%s", domain, dest+"2")); err != nil {
+		t.Fatal(err)
+	}
+
+	body, _, _ := httpDo("GET", t, fmt.Sprintf("%s%s", domain, orig+"new"), nil, "text/html")
+	if "hello from 1" != string(body) {
+		t.Fatal("http body is incorrect:", string(body))
+	}
+
+	body, _, _ = httpDo("GET", t, fmt.Sprintf("%s%s", domain, orig+"new"), nil, "text/html")
+	if "hello from 2" != string(body) {
+		t.Fatal("http body is incorrect:", string(body))
+	}
+}
